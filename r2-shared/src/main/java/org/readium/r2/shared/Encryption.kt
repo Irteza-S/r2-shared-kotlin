@@ -9,7 +9,7 @@
 
 package org.readium.r2.shared
 
-import org.readium.r2.shared.drm.Drm
+import org.readium.r2.shared.DRM.Drm
 import java.io.Serializable
 
 //  Contains metadata parsed from Encryption.xml

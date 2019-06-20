@@ -7,11 +7,118 @@
  * LICENSE file present in the project repository where this source code is maintained.
  */
 
-package org.readium.r2.shared
+package org.readium.r2.shared.Publication.WebPublication
 
 import org.json.JSONObject
+import org.readium.r2.shared.JSONable
+import org.readium.r2.shared.Publication.JSONError
+import org.readium.r2.shared.Publication.ParsingError
+import org.readium.r2.shared.Publication.WebPublication.Link.Link
+import org.readium.r2.shared.Publication.parseArray
 import java.io.Serializable
 
+
+/**
+ * TODO ADD CONSTRUCTORS
+ */
+data class Locator (val _href: String, val _type: String, val _title: String?, val _locations: Locations?, val _text: LocatorText?){
+
+    /// The URI of the resource that the Locator Object points to.
+    var href: String = ""  // URI
+    /// The media type of the resource that the Locator Object points to.
+    var type: String = ""
+    /// The title of the chapter or section which is more relevant in the context of this locator.
+    var title: String?
+    /// One or more alternative expressions of the location.
+    var locations: Locations?
+    /// Textual context of the locator.
+    var text: LocatorText?
+
+    /**
+     * TODO: Description Variable
+     */
+
+     init {
+         this.href = _href
+         this.type = _type
+         this.title = _title
+         this.locations = _locations
+         this.text = _text
+    }
+
+    /*
+    //TODO Throw exception + Constructor never used ?
+    constructor(json: Any) : this(){
+        if(json is JSONObject) {
+            this.href = if(json.has("href")) json.getString("href") else throw ParsingError.malformedJSON
+            this.type = if(json.has("type")) json.getString("type") else throw ParsingError.malformedJSON
+            this.title = json.getString("title")
+            this.locations = if(json.has("locations")) Locator(json.get("locations")) else null
+            this.text = if(json.has("text")) LocatorText(json.get("locations")) else null
+        }
+    }
+
+    constructor(link: Link) : this() {
+
+    }*/
+}
+
+
+data class LocatorText(var _after: String? = null, var _before: String? = null, var _highlight: String? = null) {
+    var after: String?
+    var before: String?
+    var highlight: String?
+
+    init {
+        this.after = _after
+        this.before = _before
+        this.highlight = _highlight
+    }
+
+    constructor(json: Any) : this() {
+        if (json is JSONObject) {
+            this.after = json.getString("after")
+            this.before = json.getString("before")
+            this.highlight = json.getString("highlight")
+        } else throw JSONError.parsing(this)
+    }
+    /** TODO : JSON STRING **/
+}
+
+
+data class Locations(var _fragment: String?, var _progression: Double?, var _position: Int?) {
+    /// Contains one or more fragment in the resource referenced by the Locator Object.
+    var fragment: String? = null // 1 = fragment identifier (toc, page lists, landmarks)
+    /// Progression in the resource expressed as a percentage.
+    var progression: Double? = null // 2 = bookmarks
+    /// An index in the publication.
+    var position: Int? = null // 3 = goto page
+
+    init {
+        this.fragment = _fragment
+        this.progression = _progression
+        this.position = _position
+    }
+
+    /*
+    constructor(json: Any) : this() {
+        if(json is JSONObject) {
+            this.fragment = json.getString("fragment")
+            this.progression = json.getDouble("progression")
+            this.position = json.getInt("position")
+        } else throw JSONError.parsing(this)
+    }
+    */
+}
+
+
+
+
+
+
+
+
+/*
 /**
  * Locator model - https://github.com/readium/architecture/tree/master/locators
  *
@@ -140,4 +247,4 @@ class Locations(var fragment: String? = null,        // 1 = fragment identifier 
         jsonString += """}"""
         return jsonString
     }
-}
+}*/

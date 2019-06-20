@@ -10,6 +10,7 @@
 package org.readium.r2.shared
 
 import org.json.JSONObject
+import org.readium.r2.shared.Publication.WebPublication.Link.Link
 
 data class Collection(var name: String) {
     var sortAs: String? = null
@@ -23,6 +24,7 @@ enum class CollectionError(val v: String) {
     InvalidCollection("Invalid collection")
 }
 
+/*
 fun parseCollection(collectionDict: JSONObject): Collection {
     val name = collectionDict["name"] as? String
             ?: throw Exception(CollectionError.InvalidCollection.name)
@@ -46,4 +48,6 @@ fun parseCollection(collectionDict: JSONObject): Collection {
         }
     }
     return c
+
 }
+*/

@@ -7,14 +7,45 @@
  * LICENSE file present in the project repository where this source code is maintained.
  */
 
-package org.readium.r2.shared
+package org.readium.r2.shared.Publication.MediaOverlays
 
-class MediaOverlays(private var nodes: MutableList<MediaOverlayNode> = mutableListOf()) {
 
-    fun clip(id: String): Clip {
-        val clip: Clip
-        val fragmentNode = nodeForFragment(id)
-        clip = fragmentNode.clip()
+/**
+ * TODO : Throwable class
+ */
+/// Errors related to MediaOverlays.
+///
+/// - nodeNotFound: Couldn't find any node for the given `forFragmentId`.
+sealed class MediaOverlaysError(message: String?) : Throwable(message) {
+    data class nodeNotFound(val forFragmentId: String?) : MediaOverlaysError(forFragmentId)
+}
+
+
+class MediaOverlays() {
+
+    var nodes: List<MediaOverlayNode>
+
+    init {
+        this.nodes = listOf()
+    }
+
+    /**
+     * Throws MediaOverlayNodeError
+     */
+    /// Get the audio `Clip` associated to an audio Fragment id.
+    /// The fragment id can be found in the HTML document in <p> & <span> tags,
+    /// it refer to a element of one of the SMIL files, providing informations
+    /// about the synchronized audio.
+    /// This function returns the clip representing this element from SMIL.
+    ///
+    /// - Parameter id: The audio fragment id.
+    /// - Returns: The `Clip`, representation of the associated SMIL element.
+    /// - Throws: `MediaOverlayNodeError.audio`,
+    ///           `MediaOverlayNodeError.timersParsing`.
+    fun clip(id: String): Clip? {
+        val clip: Clip?
+        val fragmentNode = nodeAfterFragment(id)
+        clip = fragmentNode.clip
         return clip
     }
 
@@ -27,7 +58,7 @@ class MediaOverlays(private var nodes: MutableList<MediaOverlayNode> = mutableLi
         ret.found?.let { return it } ?: throw Exception("Node not found")
     }
 
-    private fun findNode(fragment: String?, inNodes: MutableList<MediaOverlayNode>): MediaOverlayNode? {
+    private fun findNode(fragment: String?, inNodes: List<MediaOverlayNode>): MediaOverlayNode? {
         for (node in inNodes) {
             if (node.role.contains("section"))
                 findNode(fragment, node.children).let { return it }
@@ -40,7 +71,7 @@ class MediaOverlays(private var nodes: MutableList<MediaOverlayNode> = mutableLi
 
     data class NextNodeResult(val found: MediaOverlayNode?, val prevFound: Boolean)
 
-    private fun findNextNode(fragment: String?, inNodes: MutableList<MediaOverlayNode>): NextNodeResult {
+    private fun findNextNode(fragment: String?, inNodes: List<MediaOverlayNode>): NextNodeResult {
         var prevNodeFoundFlag = false
         //  For each node of the current scope...
         for (node in inNodes) {

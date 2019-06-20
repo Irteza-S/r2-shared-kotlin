@@ -7,59 +7,140 @@
  * LICENSE file present in the project repository where this source code is maintained.
  */
 
-package org.readium.r2.shared
+package org.readium.r2.shared.Publication.WebPublication.Metadata
 
-import org.joda.time.DateTime
-import org.json.JSONArray
+import androidx.annotation.RequiresPermission
 import org.json.JSONObject
+import org.readium.r2.shared.*
+import org.readium.r2.shared.Publication.*
+import org.readium.r2.shared.MultilanguageString
+import org.readium.r2.shared.Publication.WebPublication.Link.Properties
 import org.readium.r2.shared.metadata.BelongsTo
 import java.io.Serializable
 import java.util.*
 
+/// Collection type used for collection/series metadata.
+/// For convenience, the JSON schema reuse the Contributor's definition.
+typealias Collection = Contributor
+
+
 class Metadata : Serializable {
+
+    //Update from iOS
+    var identifier: String? //URI
+    var type: String? = null // URI (@type)
+    var localizedTitle: String = ""
+    var localizedSubtitle: String = ""
+    var title: String
+        get() = localizedSubtitle
+        set(newValue) {
+            this.localizedTitle = newValue
+        }
+
+    var modified: Date? = null
+    var published: Date? = null
+    var languages: List<String> = listOf()
+    var sortAs: String?
+    var subjects: List<Subject> = listOf()
+    var authors: List<Contributor> = listOf()
+    var translators: List<Contributor> = listOf()
+    var editors: List<Contributor> = listOf()
+    var artists: List<Contributor> = listOf()
+    var illustrators: List<Contributor> = listOf()
+    var letterers: List<Contributor> = listOf()
+    var pencilers: List<Contributor> = listOf()
+    var colorists: List<Contributor> = listOf()
+    var inkers: List<Contributor> = listOf()
+    var narrators: List<Contributor> = listOf()
+    var contributors: List<Contributor> = listOf()
+    var publishers: List<Contributor> = listOf()
+    var imprints: List<Contributor> = listOf()
+    /// WARNING: This contains the reading progression as declared in the publication, so it might be `auto`. To lay out the content, use `publication.contentLayout.readingProgression` to get the calculated reading progression from the declared direction and the language.
+    var readingProgression: ReadingProgression = ReadingProgression.auto
+    var description: String?
+    var duration: Double?
+    var numberOfPages: Double?
+    var belongsToCollections: List<Contributor> = listOf()
+    var belongsToSeries: List<Contributor> = listOf()
+
+
+    /// Additional properties for extensions.
+    var otherMetadata: MutableList<Pair<String, Any?>>
+        get() {
+            return otherMetadataJSON.json
+        }
+        set(newValue) {
+            otherMetadataJSON.json = newValue
+        }
+    // Trick to keep the struct equatable despite [String: Any]
+    var otherMetadataJSON: JSONDictionary = JSONDictionary(null)
+
+
+
+    //removed from iOS
+    /*
     /// The structure used for the serialisation.
     var multilanguageTitle: MultilanguageString? = null
-    /// The title of the publication.
-    var title: String = ""
-        get() = multilanguageTitle?.singleString ?: ""
-
-    var languages: MutableList<String> = mutableListOf()
-    lateinit var identifier: String
     // Contributors.
-    var authors: MutableList<Contributor> = mutableListOf()
-    var translators: MutableList<Contributor> = mutableListOf()
-    var editors: MutableList<Contributor> = mutableListOf()
-    var artists: MutableList<Contributor> = mutableListOf()
-    var illustrators: MutableList<Contributor> = mutableListOf()
-    var letterers: MutableList<Contributor> = mutableListOf()
-    var pencilers: MutableList<Contributor> = mutableListOf()
-    var colorists: MutableList<Contributor> = mutableListOf()
-    var inkers: MutableList<Contributor> = mutableListOf()
-    var narrators: MutableList<Contributor> = mutableListOf()
-    var imprints: MutableList<Contributor> = mutableListOf()
     var direction: String = PageProgressionDirection.default.name
-    var subjects: MutableList<Subject> = mutableListOf()
-    var publishers: MutableList<Contributor> = mutableListOf()
-    var contributors: MutableList<Contributor> = mutableListOf()
-    var modified: Date? = null
     var publicationDate: String? = null
-    var description: String? = null
     var rendition: Rendition = Rendition()
     var source: String? = null
-    var epubType: MutableList<String> = mutableListOf()
+    var epubType: List<String> = listOf()
     var rights: String? = null
     var rdfType: String? = null
-    var otherMetadata: MutableList<MetadataItem> = mutableListOf()
 
     var belongsTo: BelongsTo? = null
+    */
 
-    var duration: Int? = null
+    /** TODO Throw errors + ReadingProgression **/
+    constructor(_json: Any?, normalizeHref: (String) -> String = { it }) {
+        var json = JSONDictionary(_json)
+        val title = json.pop("title") as String
+        if (title == null) {
+            throw JSONError.parsing(this)
+        }
+        this.title = title
+        this.identifier = json.pop("identifier") as String
+        this.type = json.pop("@type") as? String ?: json.pop("type") as String
+        this.localizedTitle = this.title
+        this.localizedSubtitle = json.pop("subtitle") as String
+        this.modified = parseDate(json.pop("modified"))
+        this.published = parseDate(json.pop("published"))
+        this.languages = parseArray(json.pop("language"), allowingSingle = true)
+        this.sortAs = json.pop("sortAs") as? String
+        this.subjects = listOf<Subject>(Subject(json.pop("subject")!!))
+        this.authors = listOf<Contributor>(Contributor(json.pop("author")!!, normalizeHref))
+        this.translators = listOf<Contributor>(Contributor(json.pop("translator")!!, normalizeHref))
+        this.editors = listOf<Contributor>(Contributor(json.pop("editor")!!, normalizeHref))
+        this.artists = listOf<Contributor>(Contributor(json.pop("artist")!!, normalizeHref))
+        this.illustrators = listOf<Contributor>(Contributor(json.pop("illustrator")!!, normalizeHref))
+        this.letterers = listOf<Contributor>(Contributor(json.pop("letterer")!!, normalizeHref))
+        this.pencilers = listOf<Contributor>(Contributor(json.pop("penciler")!!, normalizeHref = normalizeHref))
+        this.colorists = listOf<Contributor>(Contributor(json.pop("colorist")!!, normalizeHref = normalizeHref))
+        this.inkers = listOf<Contributor>(Contributor(json.pop("inker")!!, normalizeHref = normalizeHref))
+        this.narrators = listOf<Contributor>(Contributor(json.pop("narrator")!!, normalizeHref = normalizeHref))
+        this.contributors = listOf<Contributor>(Contributor(json.pop("contributor")!!, normalizeHref = normalizeHref))
+        this.publishers = listOf<Contributor>(Contributor(json.pop("publisher")!!, normalizeHref = normalizeHref))
+        this.imprints = listOf<Contributor>(Contributor(json.pop("imprint")!!, normalizeHref = normalizeHref))
+        //this.readingProgression = if(json.pop("readingProgression")!! !=null) ReadingProgression(json.pop("readingProgression")) else ReadingProgression.auto
+        this.description = json.pop("description") as? String
+        this.duration = parsePositiveDouble(json.pop("duration"))
+        this.numberOfPages = parsePositive(json.pop("numberOfPages")) as Double
+        val belongsTo = json.pop("belongsTo") as? Map<String, Any>
+        this.belongsToCollections = listOf<Contributor>(Contributor(belongsTo?.get("collection") as String, normalizeHref))
+        this.belongsToSeries = listOf<Contributor>(Contributor(belongsTo?.get("series") as String, normalizeHref = normalizeHref))
+        this.otherMetadataJSON = json
+    }
 
+
+    //Deleted in iOS
+    /*
     fun titleForLang(key: String): String? = multilanguageTitle?.multiString?.get(key)
 
     fun writeJSON(): JSONObject {
         val obj = JSONObject()
-        obj.putOpt("languages", getStringArray(languages))
+        obj.putOpt("languages", getStringArray(languages as List<Any>))
         obj.putOpt("publicationDate", publicationDate)
         obj.putOpt("identifier", identifier)
         obj.putOpt("modified", modified)
@@ -82,7 +163,7 @@ class Metadata : Serializable {
         tryPut(obj, publishers, "publishers")
         tryPut(obj, imprints, "imprints")
         return obj
-    }
+    }*/
 
 
     fun contentLayoutStyle(langType: LangType, pageDirection: String?) : ContentLayoutStyle {
@@ -106,6 +187,7 @@ class Metadata : Serializable {
 
 }
 
+/*
 fun parseMetadata(metadataDict: JSONObject): Metadata {
     val m = Metadata()
     if (metadataDict.has("title")) {
@@ -272,7 +354,7 @@ fun parseMetadata(metadataDict: JSONObject): Metadata {
     }
 
     return m
-}
+}*/
 
 enum class LangType {
     cjk, afh, other

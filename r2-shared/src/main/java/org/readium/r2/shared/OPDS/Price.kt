@@ -7,9 +7,9 @@
  * LICENSE file present in the project repository where this source code is maintained.
  */
 
-package org.readium.r2.shared.drm
+package org.readium.r2.shared.OPDS
 
 import java.io.Serializable
-import java.net.URL
 
-data class DRMModel(val type: String, val licensePath: URL) : Serializable
+
+data class Price(var currency: String, var value: Double) : Serializable

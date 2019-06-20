@@ -13,7 +13,12 @@ import java.io.Serializable
 
 class MultilanguageString : Serializable {
 
-    var singleString: String? = null
-    var multiString: MutableMap<String, String> = mutableMapOf()
+    var singleString: String
+    var multiString: MutableMap<String, String>
+
+    constructor(_singleString: String) {
+        singleString = _singleString;
+        multiString = mutableMapOf<String, String>()
+    }
 
 }

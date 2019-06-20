@@ -7,7 +7,7 @@
  * LICENSE file present in the project repository where this source code is maintained.
  */
 
-package org.readium.r2.shared.opds
+package org.readium.r2.shared.OPDS
 
 import org.json.JSONArray
 import org.json.JSONObject

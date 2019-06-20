@@ -7,61 +7,21 @@
  * LICENSE file present in the project repository where this source code is maintained.
  */
 
-package org.readium.r2.shared
+package org.readium.r2.shared.Publication
 
 import org.json.JSONArray
 import org.json.JSONObject
+import org.readium.r2.shared.JSONable
+import org.readium.r2.shared.Publication.WebPublication.Link.Link
+import org.readium.r2.shared.Publication.WebPublication.Metadata.Metadata
+import org.readium.r2.shared.Publication.WebPublication.PublicationCollection
+import org.readium.r2.shared.Publication.WebPublication.WebPublication
+import org.readium.r2.shared.ReadiumCSSName
 import java.io.Serializable
 import java.net.URI
 import java.net.URL
 import java.net.URLDecoder
 
-
-fun URL.removeLastComponent(): URL {
-    var str = this.toString()
-    val i = str.lastIndexOf('/', 0, true)
-    if (i != -1)
-        str = str.substring(0, i)
-    return URL(str)
-}
-
-fun getJSONArray(list: List<JSONable>): JSONArray {
-    val array = JSONArray()
-    for (i in list) {
-        array.put(i.toJSON())
-    }
-    return array
-}
-
-fun getStringArray(list: List<Any>): JSONArray {
-    val array = JSONArray()
-    for (i in list) {
-        array.put(i)
-    }
-    return array
-}
-
-fun tryPut(obj: JSONObject, list: List<JSONable>, tag: String) {
-    if (list.isNotEmpty())
-        obj.putOpt(tag, getJSONArray(list))
-}
-
-// Try to put class which implements JSONable only if not empty
-fun tryPut(jsonObject: JSONObject, jsonable: JSONable, tag: String) {
-    val tempJsonObject = jsonable.toJSON()
-    if (tempJsonObject.length() != 0)
-        jsonObject.put(tag, tempJsonObject)
-}
-
-class TocElement(val link: Link, val children: List<TocElement>) : JSONable {
-
-    override fun toJSON(): JSONObject {
-        val json = link.toJSON()
-        tryPut(json, children, "children")
-        return json
-    }
-
-}
 
 /**
  * Publication store every information and meta data about an artwork and provides
@@ -71,7 +31,76 @@ class TocElement(val link: Link, val children: List<TocElement>) : JSONable {
  *      class
  *
  */
-class Publication : Serializable {
+class Publication : WebPublication, Serializable {
+
+
+
+    /// Format of the publication, if specified.
+    var format: Format = Format.unknown
+    /// Version of the publication's format, eg. 3 for EPUB 3
+    var formatVersion: String? = null
+    var userProperties = UserProperties()
+    /** TODO: userSettingsUIPreset & userSettingsUIPresetUpdated **/
+    // The status of User Settings properties (enabled or disabled).
+    var userSettingsUIPreset: List<Pair<ReadiumCSSName, Boolean>>? = listOf()
+    /// Called when the User Settings changed.
+    var userSettingsUIPresetUpdated: ((Map<ReadiumCSSName, Boolean>?) -> Unit)? = null
+
+    /// Returns the content layout style for the default publication language.
+    val contentLayout: ContentLayoutStyle
+        get() = contentLayout(null)
+
+
+    /**
+     * TODO: Return
+     */
+    /// Returns the content layout style for the given language code.
+    fun contentLayout(language: String?) : ContentLayoutStyle {
+        val language = if ((language?.isEmpty() ?: true)) null else language
+        //return ContentLayoutStyle(language ?: metadata.languages.firstOrNull() ?: "", metadata.readingProgression)
+        return ContentLayoutStyle.cjkHorizontal
+    }
+
+
+
+    constructor(format: Format = Format.unknown, formatVersion: String? = null, context: MutableList<String> = mutableListOf(), metadata: Metadata, links: MutableList<Link> = mutableListOf(), readingOrder: MutableList<Link> = mutableListOf(), resources: MutableList<Link> = mutableListOf(), tableOfContents: MutableList<Link> = mutableListOf(), otherCollections: MutableList<PublicationCollection> = mutableListOf()) : super(context = context, metadata = metadata, links = links, readingOrder = readingOrder, resources = resources, tableOfContents = tableOfContents, otherCollections = otherCollections) {
+        this.format = format
+        this.formatVersion = formatVersion
+    }
+
+     constructor(_json: Any, normalizeHref: (String) -> String = { it }) : super (_json, normalizeHref) {}
+
+    /**
+     * TODO : appendingPathComponent
+     */
+    /// Appends the self/manifest link to links.
+    ///
+    /// - Parameters:
+    ///   - endPoint: The URI prefix to use to fetch assets from the publication.
+    ///   - baseUrl: The base URL of the HTTP server.
+    fun addSelfLink(endPoint: String, baseURL: URL) {
+        // Removes any existing `self` link, just in case.
+        this.links.filter{ it.rels.contains("self") }
+        //var manifestURL = baseURL.appendingPathComponent("\\"+endPoint+"/manifest.json")
+        this.links.add(Link("","application/webpub+json",true))
+    }
+
+    fun linkWithRel(rel: String): Link? {
+        val findLinkWithRel: (Link) -> Boolean = { it.rels.contains(rel) }
+        return findLinkInPublicationLinks(findLinkWithRel)
+    }
+
+    fun linkWithHref(href: String): Link? {
+        val findLinkWithHref: (Link) -> Boolean = {
+            isLinkWithHref(href, it) ||
+                    isLinkWithHrefURIDecoded(href, it) ||
+                    isLinkWithLinkHrefURLDecoded(href, it)
+        }
+        return findLinkInPublicationLinks(findLinkWithHref)
+    }
+
+
+
 
     /**
      * Enumeration of every handled mime type
@@ -100,40 +129,6 @@ class Publication : Serializable {
     }
 
 
-    /// The kind of publication it is ( Epub, Cbz, ... )
-    var type = TYPE.EPUB
-    /// The version of the publication, if the type needs any.
-    var version: Double = 0.0
-    /// The metadata (title, identifier, contributors, etc.).
-    var metadata: Metadata = Metadata()
-    /// org.readium.r2shared.Publication.org.readium.r2shared.Link to special resources which are added to the publication.
-    var links: MutableList<Link> = mutableListOf()
-    /// Links of the spine items of the publication.
-    var readingOrder: MutableList<Link> = mutableListOf()
-    /// Link to the resources of the publication.
-    var resources: MutableList<Link> = mutableListOf()
-    /// Table of content of the publication.
-    var tableOfContents: MutableList<Link> = mutableListOf()
-    var landmarks: MutableList<Link> = mutableListOf()
-    var listOfAudioFiles: MutableList<Link> = mutableListOf()
-    var listOfIllustrations: MutableList<Link> = mutableListOf()
-    var listOfTables: MutableList<Link> = mutableListOf()
-    var listOfVideos: MutableList<Link> = mutableListOf()
-    var pageList: MutableList<Link> = mutableListOf()
-
-    var images: MutableList<Link> = mutableListOf()
-
-    /// Extension point for links that shouldn't show up in the manifest.
-    var otherLinks: MutableList<Link> = mutableListOf()
-    var internalData: MutableMap<String, String> = mutableMapOf()
-
-    var userSettingsUIPreset: MutableMap<ReadiumCSSName, Boolean> = mutableMapOf()
-
-    var cssStyle: String? = null
-
-    var coverLink: Link? = null
-        get() = linkWithRel("cover")
-
     fun baseUrl(): URL? {
         val selfLink = linkWithRel("self")
         if (selfLink != null) {
@@ -144,6 +139,8 @@ class Publication : Serializable {
         return null
     }
 
+    //Deleted on iOS
+    /*
     fun manifest(): String {
         val json = JSONObject()
         json.put("metadata", metadata.writeJSON())
@@ -159,7 +156,7 @@ class Publication : Serializable {
         str = str.replace("\\/", "/")
         return str
     }
-
+    */
     fun resource(href: String): Link? =
             (readingOrder + resources).firstOrNull {
                 isLinkWithHref(href, it) ||
@@ -167,19 +164,9 @@ class Publication : Serializable {
                         isLinkWithLinkHrefURLDecoded(href, it)
             }
 
-    fun linkWithRel(rel: String): Link? {
-        val findLinkWithRel: (Link) -> Boolean = { it.rel.contains(rel) }
-        return findLinkInPublicationLinks(findLinkWithRel)
-    }
 
-    fun linkWithHref(href: String): Link? {
-        val findLinkWithHref: (Link) -> Boolean = {
-            isLinkWithHref(href, it) ||
-                    isLinkWithHrefURIDecoded(href, it) ||
-                    isLinkWithLinkHrefURLDecoded(href, it)
-        }
-        return findLinkInPublicationLinks(findLinkWithHref)
-    }
+
+
 
     private fun isLinkWithHref(href: String, link: Link): Boolean {
         return href == link.href || "/$href" == link.href
@@ -203,21 +190,12 @@ class Publication : Serializable {
         }
     }
 
+
     private fun findLinkInPublicationLinks(closure: (Link) -> Boolean) =
             resources.firstOrNull(closure) ?: readingOrder.firstOrNull(closure)
             ?: links.firstOrNull(closure) ?: pageList.firstOrNull(closure)
 
-    fun addSelfLink(endPoint: String, baseURL: URL) {
-        val publicationUrl: URL
-        val link = Link()
-        val manifestPath = "$endPoint/manifest.json"
 
-        publicationUrl = URL(baseURL.toString() + manifestPath)
-        link.href = publicationUrl.toString()
-        link.typeLink = "application/webpub+json"
-        link.rel.add("self")
-        links.add(link)
-    }
 
     enum class PublicationError(var v: String) {
         InvalidPublication("Invalid publication")
@@ -225,10 +203,34 @@ class Publication : Serializable {
 }
 
 
+
+sealed class Format(val mimetype: String?) {
+
+    object cbz : Format("")
+    object epub : Format("")
+    object pdf : Format("")
+
+    data class other (val v1: String) : Format("")
+    object unknown : Format("")
+
+    init {
+
+        val mimetype = mimetype
+        if(mimetype ==null) {
+            //this = unknown
+        }
+    }
+
+
+}
+
+
+
+//Deleted on iOS
 /**
  * Parse a JSON dictionary of extra information into a publication
- *
- */
+
+
 fun parsePublication(pubDict: JSONObject): Publication {
     val p = Publication()
 
@@ -365,4 +367,53 @@ fun parsePublication(pubDict: JSONObject): Publication {
 //    var internalData: MutableMap<String, String> = mutableMapOf()
 
     return p
+}
+*/
+
+
+
+fun URL.removeLastComponent(): URL {
+    var str = this.toString()
+    val i = str.lastIndexOf('/', 0, true)
+    if (i != -1)
+        str = str.substring(0, i)
+    return URL(str)
+}
+
+fun getJSONArray(list: MutableList<JSONable>): JSONArray {
+    val array = JSONArray()
+    for (i in list) {
+        array.put(i.toJSON())
+    }
+    return array
+}
+
+fun getStringArray(list: List<Any>): JSONArray {
+    val array = JSONArray()
+    for (i in list) {
+        array.put(i)
+    }
+    return array
+}
+
+fun tryPut(obj: JSONObject, list: MutableList<JSONable>, tag: String) {
+    if (list.isNotEmpty())
+        obj.putOpt(tag, getJSONArray(list))
+}
+
+// Try to put class which implements JSONable only if not empty
+fun tryPut(jsonObject: JSONObject, jsonable: JSONable, tag: String) {
+    val tempJsonObject = jsonable.toJSON()
+    if (tempJsonObject.length() != 0)
+        jsonObject.put(tag, tempJsonObject)
+}
+
+class TocElement(val link: Link, val children: MutableList<TocElement>) : JSONable {
+
+    override fun toJSON(): JSONObject {
+        val json = link.toJSON()
+        tryPut(json, children as MutableList<JSONable>, "children")
+        return json
+    }
+
 }

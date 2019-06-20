@@ -7,7 +7,7 @@
  * LICENSE file present in the project repository where this source code is maintained.
  */
 
-package org.readium.r2.shared.drm
+package org.readium.r2.shared.DRM
 
 import org.joda.time.DateTime
 import java.io.Serializable

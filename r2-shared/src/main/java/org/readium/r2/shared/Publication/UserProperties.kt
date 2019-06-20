@@ -7,19 +7,12 @@
  * LICENSE file present in the project repository where this source code is maintained.
  */
 
-package org.readium.r2.shared
+package org.readium.r2.shared.Publication
 
 import java.io.Serializable
 
-sealed class UserProperty(var ref: String, var name: String) {
-
-    private val value: String
-        get() = this.toString()
-
-    abstract override fun toString(): String
-    fun getJson(): String {
-        return """{name:"$name",value:"${this}"}"""
-    }
+sealed class UserProperty(var reference: String, var name: String) {
+    fun toSring() = ""
 
 }
 
@@ -30,13 +23,7 @@ class Enumerable(var index: Int, private val values: List<String>, ref: String, 
     override fun toString() = values[index]
 }
 
-class Incremental(var value: Float,
-                  val min: Float,
-                  val max: Float,
-                  private val step: Float,
-                  private val suffix: String,
-                  ref: String,
-                  name: String) : UserProperty(ref, name) {
+class Incremental(var value: Float, val min: Float, val max: Float, private val step: Float, private val suffix: String, ref: String, name: String) : UserProperty(ref, name) {
 
     fun increment() {
         value += (if (value + step <= max) step else 0.0f)
@@ -78,7 +65,7 @@ class UserProperties : Serializable {
     }
 
     fun <T : UserProperty> getByRef(ref: String) = properties.firstOrNull {
-        it.ref == ref
+        it.reference == ref
     }!! as T
 }
 
