@@ -21,16 +21,20 @@ sealed class MediaOverlaysError(message: String?) : Throwable(message) {
 }
 
 
-class MediaOverlays() {
+class MediaOverlays {
 
-    var nodes: List<MediaOverlayNode>
+    var nodes: MutableList<MediaOverlayNode>
 
     init {
-        this.nodes = listOf()
+        this.nodes = mutableListOf()
+    }
+
+    fun append(newNode: MediaOverlayNode) {
+        nodes.add(newNode)
     }
 
     /**
-     * Throws MediaOverlayNodeError
+     * TODO: Throws MediaOverlayNodeError
      */
     /// Get the audio `Clip` associated to an audio Fragment id.
     /// The fragment id can be found in the HTML document in <p> & <span> tags,
@@ -58,6 +62,17 @@ class MediaOverlays() {
         ret.found?.let { return it } ?: throw Exception("Node not found")
     }
 
+    // Mark: - Fileprivate Methods.
+
+    /// [RECURISVE]
+    /// Find the node (<par>) corresponding to "fragment" ?? nil.
+    ///
+    /// - Parameters:
+    ///   - fragment: The current fragment name for which we are looking the
+    ///               associated media overlay node.
+    ///   - nodes: The set of MediaOverlayNodes where to search. Default to
+    ///            self children.
+    /// - Returns: The node we found ?? nil.
     private fun findNode(fragment: String?, inNodes: List<MediaOverlayNode>): MediaOverlayNode? {
         for (node in inNodes) {
             if (node.role.contains("section"))
@@ -71,6 +86,16 @@ class MediaOverlays() {
 
     data class NextNodeResult(val found: MediaOverlayNode?, val prevFound: Boolean)
 
+    /// [RECURISVE]
+    /// Find the node (<par>) corresponding to the next one after the given
+    /// "fragment" ?? nil.
+    ///
+    /// - Parameters:
+    ///   - fragment: The fragment name corresponding to the node previous to
+    ///               the one we want.
+    ///   - nodes: The set of MediaOverlayNodes where to search. Default to
+    ///            self children.
+    /// - Returns: The node we found ?? nil.
     private fun findNextNode(fragment: String?, inNodes: List<MediaOverlayNode>): NextNodeResult {
         var prevNodeFoundFlag = false
         //  For each node of the current scope...
@@ -99,6 +124,10 @@ class MediaOverlays() {
         return NextNodeResult(null, prevNodeFoundFlag)
     }
 
+    /// Returns the closest non section children node found.
+    ///
+    /// - Parameter node: The section node
+    /// - Returns: The closest non section node or nil.
     private fun getFirstNonSectionChild(node: MediaOverlayNode): MediaOverlayNode? {
         node.children.forEach { child ->
             if (child.role.contains("section")) {

@@ -72,11 +72,11 @@ class Link  : JSONable, Serializable  {
     }
 
     /**
-     * TODO: Parsing Errors(template if href is URI?) + try catch Properties + Children&Rels Arrays
+     * TODO: Parsing Errors(template if href is URI?) + try catch on Properties + Children&Rels Arrays
      */
     constructor(_json: Any?, normalizeHref: (String) -> String = { it }) {
         try {
-            var json = JSONObject((_json as String).toString())
+            var json = JSONObject(_json as String)
             this.href = if(json.has("href")) json.getString("href") else throw ParsingError.malformedJSON
             this.type = if(json.has("type")) json.getString("type") else null
             this.templated = if(json.has("href")) json.getBoolean("templated") else false
@@ -122,22 +122,23 @@ class Link  : JSONable, Serializable  {
         return json
     }
 
-    /*
-    fun isEncrypted(): Boolean {
-        return properties?.encryption != null
-    }*/
-
 }
+
+
+/**
+ * TODO : this is not in iOS
+ */
+
+/*
+  fun isEncrypted(): Boolean {
+        return properties?.encryption != null
+    }
 
 enum class LinkError(var v: String) {
     InvalidLink("Invalid link"),
 }
 
-/**
- * TODO : not in iOS
- */
 
-/*
 fun parseLink(linkDict: JSONObject, feedUrl: URL? = null): Link {
     val link = Link()
     if (linkDict.has("title")) {

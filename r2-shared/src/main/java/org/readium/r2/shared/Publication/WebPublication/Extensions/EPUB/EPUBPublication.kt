@@ -26,7 +26,7 @@ private val loiKey = "loi"
 private val lotKey = "lot"
 private val lovKey = "lov"
 
-
+/*
 var WebPublication.pageList : List<Link>
     get() {
         val tmp = otherCollections.first { landmarksKey }
@@ -34,3 +34,5 @@ var WebPublication.pageList : List<Link>
     set (value) {
 
     }
+
+*/

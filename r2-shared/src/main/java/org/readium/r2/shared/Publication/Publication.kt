@@ -51,6 +51,10 @@ class Publication : WebPublication, Serializable {
         get() = contentLayout(null)
 
 
+
+    var pageList: MutableList<Link> = mutableListOf()
+
+
     /**
      * TODO: Return
      */
@@ -369,8 +373,6 @@ fun parsePublication(pubDict: JSONObject): Publication {
     return p
 }
 */
-
-
 
 fun URL.removeLastComponent(): URL {
     var str = this.toString()

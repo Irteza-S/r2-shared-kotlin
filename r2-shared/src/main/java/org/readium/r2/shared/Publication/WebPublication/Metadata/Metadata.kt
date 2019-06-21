@@ -60,8 +60,8 @@ class Metadata : Serializable {
     var description: String?
     var duration: Double?
     var numberOfPages: Double?
-    var belongsToCollections: List<Contributor> = listOf()
-    var belongsToSeries: List<Contributor> = listOf()
+    var belongsToCollections: List<Collection> = listOf()
+    var belongsToSeries: List<Collection> = listOf()
 
 
     /// Additional properties for extensions.
@@ -74,8 +74,6 @@ class Metadata : Serializable {
         }
     // Trick to keep the struct equatable despite [String: Any]
     var otherMetadataJSON: JSONDictionary = JSONDictionary(null)
-
-
 
     //removed from iOS
     /*

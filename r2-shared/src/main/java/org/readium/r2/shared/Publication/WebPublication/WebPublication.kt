@@ -25,7 +25,6 @@ open class WebPublication {
         this.resources = resources
         this.tableOfContents = tableOfContents
         this.otherCollections = otherCollections
-
     }
 
     /**
