@@ -50,7 +50,7 @@ open class WebPublication {
 
 
     /**
-     * TODO : Else
+     * TODO : Else case
      */
     /// Replaces the links for the first found subcollection with the given role.
     /// If none is found, creates a new subcollection.

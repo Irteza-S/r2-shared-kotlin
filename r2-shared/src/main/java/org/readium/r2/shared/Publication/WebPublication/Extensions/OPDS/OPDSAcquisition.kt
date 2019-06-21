@@ -19,7 +19,7 @@ data class OPDSAcquisition (var _type: String, var _children: List<OPDSAcquisiti
     }
 
     /**
-     * TODO: Throw errors
+     * TODO: Not sure about what to throw
      */
     constructor(_json: Any?) : this("", listOf()) {
         if(_json != null) {

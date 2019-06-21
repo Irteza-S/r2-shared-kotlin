@@ -40,7 +40,7 @@ class Publication : WebPublication, Serializable {
     /// Version of the publication's format, eg. 3 for EPUB 3
     var formatVersion: String? = null
     var userProperties = UserProperties()
-    /** TODO: userSettingsUIPreset & userSettingsUIPresetUpdated **/
+    /** TODO: Add var userSettingsUIPreset & var userSettingsUIPresetUpdated **/
     // The status of User Settings properties (enabled or disabled).
     var userSettingsUIPreset: List<Pair<ReadiumCSSName, Boolean>>? = listOf()
     /// Called when the User Settings changed.
@@ -75,7 +75,7 @@ class Publication : WebPublication, Serializable {
      constructor(_json: Any, normalizeHref: (String) -> String = { it }) : super (_json, normalizeHref) {}
 
     /**
-     * TODO : appendingPathComponent
+     * TODO : baseURL.appendingPathComponent()
      */
     /// Appends the self/manifest link to links.
     ///

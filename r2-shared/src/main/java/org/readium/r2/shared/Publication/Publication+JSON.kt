@@ -100,6 +100,9 @@ fun parsePositiveDouble(json: Any?) : Double? {
 }
 
 
+/**
+ * Todo: Complete function
+ */
 /// enum Example: String {
 ///     case hello
 /// }
@@ -110,6 +113,9 @@ fun <T> parseRaw(json: Any?) : T? {
 }
 
 
+/**
+ * TODO: Not sure about this
+ */
 /// Returns the value if not nil, or NSNull.
 fun encodeIfNotNull(value: Any?): Any? {
     if(value!=null) {

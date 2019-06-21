@@ -37,7 +37,7 @@ class Drm(var brand: Brand) : Serializable {
 
 
 /**
- * TODO : Change DATA object (String to Datas
+ * TODO : Change var decipher: String to var decipher: DATA
  */
 
 /// Shared DRM behavior for a particular license/publication.

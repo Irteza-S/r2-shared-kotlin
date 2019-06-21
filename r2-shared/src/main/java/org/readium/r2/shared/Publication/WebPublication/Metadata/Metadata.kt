@@ -9,13 +9,7 @@
 
 package org.readium.r2.shared.Publication.WebPublication.Metadata
 
-import androidx.annotation.RequiresPermission
-import org.json.JSONObject
-import org.readium.r2.shared.*
 import org.readium.r2.shared.Publication.*
-import org.readium.r2.shared.MultilanguageString
-import org.readium.r2.shared.Publication.WebPublication.Link.Properties
-import org.readium.r2.shared.metadata.BelongsTo
 import java.io.Serializable
 import java.util.*
 
@@ -75,7 +69,50 @@ class Metadata : Serializable {
     // Trick to keep the struct equatable despite [String: Any]
     var otherMetadataJSON: JSONDictionary = JSONDictionary(null)
 
-    //removed from iOS
+
+    /** TODO Throw errors + if(title) condition + ReadingProgression **/
+    constructor(_json: Any?, normalizeHref: (String) -> String = { it }) {
+        var json = JSONDictionary(_json)
+        val title = json.pop("title") as String
+        if (title == null) {
+            throw JSONError.parsing(this)
+        }
+        this.title = title
+        this.identifier = json.pop("identifier") as String
+        this.type = json.pop("@type") as? String ?: json.pop("type") as String
+        this.localizedTitle = this.title
+        this.localizedSubtitle = json.pop("subtitle") as String
+        this.modified = parseDate(json.pop("modified"))
+        this.published = parseDate(json.pop("published"))
+        this.languages = parseArray(json.pop("language"), true)
+        this.sortAs = json.pop("sortAs") as? String
+        this.subjects = listOf<Subject>(Subject(json.pop("subject")!!))
+        this.authors = listOf<Contributor>(Contributor(json.pop("author")!!, normalizeHref))
+        this.translators = listOf<Contributor>(Contributor(json.pop("translator")!!, normalizeHref))
+        this.editors = listOf<Contributor>(Contributor(json.pop("editor")!!, normalizeHref))
+        this.artists = listOf<Contributor>(Contributor(json.pop("artist")!!, normalizeHref))
+        this.illustrators = listOf<Contributor>(Contributor(json.pop("illustrator")!!, normalizeHref))
+        this.letterers = listOf<Contributor>(Contributor(json.pop("letterer")!!, normalizeHref))
+        this.pencilers = listOf<Contributor>(Contributor(json.pop("penciler")!!, normalizeHref))
+        this.colorists = listOf<Contributor>(Contributor(json.pop("colorist")!!, normalizeHref))
+        this.inkers = listOf<Contributor>(Contributor(json.pop("inker")!!, normalizeHref))
+        this.narrators = listOf<Contributor>(Contributor(json.pop("narrator")!!, normalizeHref))
+        this.contributors = listOf<Contributor>(Contributor(json.pop("contributor")!!, normalizeHref))
+        this.publishers = listOf<Contributor>(Contributor(json.pop("publisher")!!, normalizeHref))
+        this.imprints = listOf<Contributor>(Contributor(json.pop("imprint")!!, normalizeHref))
+        //this.readingProgression = if(json.pop("readingProgression")!! !=null) ReadingProgression(json.pop("readingProgression")) else ReadingProgression.auto
+        this.description = json.pop("description") as? String
+        this.duration = parsePositiveDouble(json.pop("duration"))
+        this.numberOfPages = parsePositive(json.pop("numberOfPages")) as Double
+        val belongsTo = json.pop("belongsTo") as? Map<String, Any>
+        this.belongsToCollections = listOf<Contributor>(Contributor(belongsTo?.get("collection") as String, normalizeHref))
+        this.belongsToSeries = listOf<Contributor>(Contributor(belongsTo?.get("series") as String, normalizeHref))
+        this.otherMetadataJSON = json
+    }
+
+
+
+    //removed in iOS
     /*
     /// The structure used for the serialisation.
     var multilanguageTitle: MultilanguageString? = null
@@ -91,48 +128,7 @@ class Metadata : Serializable {
     var belongsTo: BelongsTo? = null
     */
 
-    /** TODO Throw errors + ReadingProgression **/
-    constructor(_json: Any?, normalizeHref: (String) -> String = { it }) {
-        var json = JSONDictionary(_json)
-        val title = json.pop("title") as String
-        if (title == null) {
-            throw JSONError.parsing(this)
-        }
-        this.title = title
-        this.identifier = json.pop("identifier") as String
-        this.type = json.pop("@type") as? String ?: json.pop("type") as String
-        this.localizedTitle = this.title
-        this.localizedSubtitle = json.pop("subtitle") as String
-        this.modified = parseDate(json.pop("modified"))
-        this.published = parseDate(json.pop("published"))
-        this.languages = parseArray(json.pop("language"), allowingSingle = true)
-        this.sortAs = json.pop("sortAs") as? String
-        this.subjects = listOf<Subject>(Subject(json.pop("subject")!!))
-        this.authors = listOf<Contributor>(Contributor(json.pop("author")!!, normalizeHref))
-        this.translators = listOf<Contributor>(Contributor(json.pop("translator")!!, normalizeHref))
-        this.editors = listOf<Contributor>(Contributor(json.pop("editor")!!, normalizeHref))
-        this.artists = listOf<Contributor>(Contributor(json.pop("artist")!!, normalizeHref))
-        this.illustrators = listOf<Contributor>(Contributor(json.pop("illustrator")!!, normalizeHref))
-        this.letterers = listOf<Contributor>(Contributor(json.pop("letterer")!!, normalizeHref))
-        this.pencilers = listOf<Contributor>(Contributor(json.pop("penciler")!!, normalizeHref = normalizeHref))
-        this.colorists = listOf<Contributor>(Contributor(json.pop("colorist")!!, normalizeHref = normalizeHref))
-        this.inkers = listOf<Contributor>(Contributor(json.pop("inker")!!, normalizeHref = normalizeHref))
-        this.narrators = listOf<Contributor>(Contributor(json.pop("narrator")!!, normalizeHref = normalizeHref))
-        this.contributors = listOf<Contributor>(Contributor(json.pop("contributor")!!, normalizeHref = normalizeHref))
-        this.publishers = listOf<Contributor>(Contributor(json.pop("publisher")!!, normalizeHref = normalizeHref))
-        this.imprints = listOf<Contributor>(Contributor(json.pop("imprint")!!, normalizeHref = normalizeHref))
-        //this.readingProgression = if(json.pop("readingProgression")!! !=null) ReadingProgression(json.pop("readingProgression")) else ReadingProgression.auto
-        this.description = json.pop("description") as? String
-        this.duration = parsePositiveDouble(json.pop("duration"))
-        this.numberOfPages = parsePositive(json.pop("numberOfPages")) as Double
-        val belongsTo = json.pop("belongsTo") as? Map<String, Any>
-        this.belongsToCollections = listOf<Contributor>(Contributor(belongsTo?.get("collection") as String, normalizeHref))
-        this.belongsToSeries = listOf<Contributor>(Contributor(belongsTo?.get("series") as String, normalizeHref = normalizeHref))
-        this.otherMetadataJSON = json
-    }
-
-
-    //Deleted in iOS
+    //removed in iOS
     /*
     fun titleForLang(key: String): String? = multilanguageTitle?.multiString?.get(key)
 
@@ -184,6 +180,7 @@ class Metadata : Serializable {
     }
 
 }
+
 
 /*
 fun parseMetadata(metadataDict: JSONObject): Metadata {

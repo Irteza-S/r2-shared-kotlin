@@ -19,7 +19,7 @@ data class OPDSPrice(var _currency: String, var _value: Double) {
     }
 
     /**
-     * TODO: Throw errors
+     * TODO: Not sure about what to throw
      */
     constructor(_json: Any?) : this("", 0.0) {
         if(_json != null) {

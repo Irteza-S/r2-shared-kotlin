@@ -11,7 +11,7 @@ package org.readium.r2.shared.Publication.MediaOverlays
 
 
 /**
- * TODO : Throwable class ?
+ * TODO : this class (MediaOverlaysError) inherits from Swift.Misc.Error in iOS
  */
 /// Errors related to MediaOverlays.
 ///
@@ -34,7 +34,7 @@ class MediaOverlays {
     }
 
     /**
-     * TODO: Throws MediaOverlayNodeError
+     * TODO: This class must throw MediaOverlayNodeError
      */
     /// Get the audio `Clip` associated to an audio Fragment id.
     /// The fragment id can be found in the HTML document in <p> & <span> tags,

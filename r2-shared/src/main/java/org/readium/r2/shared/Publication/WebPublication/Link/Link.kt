@@ -72,7 +72,7 @@ class Link  : JSONable, Serializable  {
     }
 
     /**
-     * TODO: Parsing Errors(template if href is URI?) + try catch on Properties + Children&Rels Arrays
+     * TODO: Parsing Errors(var template if href is URI) + try catch on Properties + var Children & varRels Arrays Parsing?
      */
     constructor(_json: Any?, normalizeHref: (String) -> String = { it }) {
         try {

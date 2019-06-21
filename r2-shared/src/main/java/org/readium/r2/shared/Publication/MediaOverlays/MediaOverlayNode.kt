@@ -11,8 +11,10 @@ package org.readium.r2.shared.Publication.MediaOverlays
 
 import java.net.URL
 
+/**
+ * TODO : change var realativeUrl: URL
+ */
 /// The publicly accessible struct.
-
 /// Clip is the representation of a MediaOverlay file fragment. A clip represent
 /// the synchronized audio for a piece of text, it has a file where its data
 /// belong, start/end times relatives to this file's data and  a duration
@@ -37,6 +39,9 @@ class Clip {
 ///
 /// - audio: Couldn't generate a proper clip due to erroneous audio property.
 /// - timersParsing: Couldn't generate a proper clip due to timersParsing failure.
+/**
+ * TODO: This class inherits from Swift.Misc.Error on iOS
+ */
 enum class MediaOverlayNodeError (val rawValue: String) {
     audio("Audio Error"), timersParsing("Timers parsing error");
 
@@ -66,6 +71,9 @@ class MediaOverlayNode(var _text: String? = null, var _clip: Clip? = null) {
         this.children = listOf()
     }
 
+    /**
+     * TODO: Not sure about this function
+     */
     private fun fragmentId(): String? {
         val text = this.text ?: return null
         return text.split('#').last()
