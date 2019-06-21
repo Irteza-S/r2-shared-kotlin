@@ -77,7 +77,7 @@ class Link  : JSONable, Serializable  {
     constructor(_json: Any?, normalizeHref: (String) -> String = { it }) {
         try {
             var json = JSONObject(_json as String)
-            this.href = if(json.has("href")) json.getString("href") else throw ParsingError.malformedJSON
+            this.href = if(json.has("href")) json.getString("href") else throw Error.malformedJSON
             this.type = if(json.has("type")) json.getString("type") else null
             this.templated = if(json.has("href")) json.getBoolean("templated") else false
             this.title = if(json.has("href")) json.getString("title") else null
@@ -89,7 +89,7 @@ class Link  : JSONable, Serializable  {
             this.duration = if(json.has("width")) parsePositiveDouble(json.getDouble("width")) as Double else null
             this.children = if(json.has("children")) parseArray(json.getJSONArray("children")) else listOf()
         } catch (e: Exception) {
-            throw ParsingError.malformedJSON
+            throw Error.malformedJSON
         }
     }
 
@@ -108,7 +108,7 @@ class Link  : JSONable, Serializable  {
         if(rels.isNotEmpty())
             json.putOpt("rel", getStringArray(rels))
         if(properties!= null)
-            json.putOpt("rel", properties.json)
+            json.putOpt("rel", properties.toJSON())
         if (encodeIfNotNull(height) != null )
             json.putOpt("height", height)
         if (encodeIfNotNull(width) != null )

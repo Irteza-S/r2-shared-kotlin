@@ -1,7 +1,7 @@
 package org.readium.r2.shared.Publication.WebPublication.Extensions.OPDS
 
 import org.json.JSONObject
-import org.readium.r2.shared.Publication.ParsingError
+import org.readium.r2.shared.Publication.Error
 import org.readium.r2.shared.Publication.parsePositiveDouble
 
 
@@ -25,8 +25,8 @@ data class OPDSPrice(var _currency: String, var _value: Double) {
         if(_json != null) {
 
             var json = JSONObject(_json as String)
-            this.currency = if(json.has("currency")) json.getString("currency") else throw ParsingError.malformedJSON
-            this.value = if(json.has("value")) parsePositiveDouble(json.get("value")) as Double else throw ParsingError.malformedJSON
+            this.currency = if(json.has("currency")) json.getString("currency") else throw Error.malformedJSON
+            this.value = if(json.has("value")) parsePositiveDouble(json.get("value")) as Double else throw Error.malformedJSON
         }
     }
 

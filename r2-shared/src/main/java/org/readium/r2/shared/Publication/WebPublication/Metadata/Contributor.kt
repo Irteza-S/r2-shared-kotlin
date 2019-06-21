@@ -58,7 +58,7 @@ class Contributor : JSONable, Serializable {
             }
             is JSONObject -> {
                 var json = JSONObject((_json as String).toString())
-                this.name = if(json.has("name")) json.getString("name") else throw ParsingError.malformedJSON
+                this.name = if(json.has("name")) json.getString("name") else throw Error.malformedJSON
                 this.localizedName = if(json.has("localizedName")) json.getString("localizedName") else null
                 this.identifier = if(json.has("href")) json.getString("templated") else null
                 this.sortAs = if(json.has("sortAs")) json.getString("sortAs") else null
@@ -67,7 +67,7 @@ class Contributor : JSONable, Serializable {
                 this.links = if(json.has("links")) parseArray(json.getJSONArray("links"), true) else listOf()
             }
             else -> {
-                throw ParsingError.malformedJSON
+                throw Error.malformedJSON
             }
         }
     }

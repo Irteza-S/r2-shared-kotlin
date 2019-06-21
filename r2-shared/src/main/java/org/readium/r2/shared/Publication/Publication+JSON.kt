@@ -2,14 +2,14 @@ package org.readium.r2.shared.Publication
 
 import java.text.SimpleDateFormat
 import java.util.*
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-
 //Class imported from iOS
 
 class JSONDictionary {
     var json: MutableList<Pair<String, Any?>>
 
+    /**
+     * TODO: Cast?
+     */
     constructor(_json: Any? = null) {
         if(_json==null) {
             json = mutableListOf()
@@ -68,7 +68,7 @@ fun <T> parseArray(json: Any?, allowingSingle: Boolean = false) : MutableList<T>
 
 fun parseDate(jsonDate: Any?) : Date?  {
     if(jsonDate is String) {
-        val date = SimpleDateFormat("Y-M-dTH:m:s.SSS").parse(jsonDate as String)
+        val date = SimpleDateFormat("Y-M-dTH:m:s.SSS").parse(jsonDate)
         return date
     }
     return null

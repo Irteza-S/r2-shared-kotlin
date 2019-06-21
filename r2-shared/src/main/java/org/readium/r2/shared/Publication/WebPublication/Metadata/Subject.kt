@@ -12,8 +12,7 @@ package org.readium.r2.shared.Publication.WebPublication.Metadata
 import org.json.JSONObject
 import org.readium.r2.shared.JSONable
 import org.readium.r2.shared.Publication.WebPublication.Link.Link
-import org.readium.r2.shared.MultilanguageString
-import org.readium.r2.shared.Publication.ParsingError
+import org.readium.r2.shared.Publication.Error
 import org.readium.r2.shared.Publication.getStringArray
 import org.readium.r2.shared.Publication.parseArray
 import java.io.Serializable
@@ -40,7 +39,7 @@ class Subject : JSONable, Serializable {
                 this.localizedName = json
             }
             is JSONObject -> {
-                this.name = if(json.has("name")) json.getString("name") else throw ParsingError.malformedJSON
+                this.name = if(json.has("name")) json.getString("name") else throw Error.malformedJSON
                 this.sortAs = json.getString("sortAs")
                 this.scheme = json.getString("sortAs")
                 this.links = if(json.has("links")) parseArray(json.getJSONArray("links"), true) else mutableListOf()

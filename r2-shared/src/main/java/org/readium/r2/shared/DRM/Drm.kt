@@ -37,9 +37,9 @@ class Drm(var brand: Brand) : Serializable {
 
 
 /**
- * TODO : Change DATA object
+ * TODO : Change DATA object (String to Datas
  */
-/*
+
 /// Shared DRM behavior for a particular license/publication.
 /// DRMs can be very different beasts, so DRMLicense is not meant to be a generic interface for all DRM behaviors (eg. loan return). The goal of DRMLicense is to provide generic features that are used inside Readium's projects directly. For example, data decryption or copy of text selection in the navigator.
 /// If there's a need for other generic DRM features, it can be implemented as a set of adapters in the client app, to cater to the interface's needs and capabilities.
@@ -48,7 +48,7 @@ interface DRMLicense {
     /// Encryption profile, if available.
     val encryptionProfile: String?
     /// Depichers the given encrypted data to be displayed in the reader.
-    fun decipher(data: Data) : Data?
+    fun decipher(data: String) : String?
     /// Returns whether the user can copy extracts from the publication.
     val canCopy: Boolean
     /// Processes the given text to be copied by the user.
@@ -56,12 +56,11 @@ interface DRMLicense {
     /// - Returns: The (potentially modified) text to put in the user clipboard, or nil if the user is not allowed to copy it.
     fun copy(text: String) : String?
 }
- */
+
 
 /**
  * TODO : DRMLicense interface
  */
-/*
 val DRMLicense.encryptionProfile: String?
     get() = null
 val DRMLicense.canCopy: Boolean
@@ -69,5 +68,4 @@ val DRMLicense.canCopy: Boolean
 
 fun DRMLicense.copy(text: String) : String? =
         if (canCopy) text else null
-*/
 

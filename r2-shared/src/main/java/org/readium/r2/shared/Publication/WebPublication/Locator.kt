@@ -10,18 +10,16 @@
 package org.readium.r2.shared.Publication.WebPublication
 
 import org.json.JSONObject
-import org.readium.r2.shared.JSONable
 import org.readium.r2.shared.Publication.JSONError
-import org.readium.r2.shared.Publication.ParsingError
 import org.readium.r2.shared.Publication.WebPublication.Link.Link
-import org.readium.r2.shared.Publication.parseArray
-import java.io.Serializable
+import org.readium.r2.shared.Publication.encodeIfNotNull
+import org.readium.r2.shared.Publication.getStringArray
 
 
 /**
- * TODO ADD CONSTRUCTORS
+ * TODO ADD CONSTRUCTORS + var Description
  */
-data class Locator (val _href: String, val _type: String, val _title: String?, val _locations: Locations?, val _text: LocatorText?){
+data class Locator (val _href: String, val _type: String, val _title: String? = null, val _locations: Locations? = null, val _text: LocatorText? = null){
 
     /// The URI of the resource that the Locator Object points to.
     var href: String = ""  // URI
@@ -34,10 +32,6 @@ data class Locator (val _href: String, val _type: String, val _title: String?, v
     /// Textual context of the locator.
     var text: LocatorText?
 
-    /**
-     * TODO: Description Variable
-     */
-
      init {
          this.href = _href
          this.type = _type
@@ -46,21 +40,22 @@ data class Locator (val _href: String, val _type: String, val _title: String?, v
          this.text = _text
     }
 
-    /*
-    //TODO Throw exception + Constructor never used ?
-    constructor(json: Any) : this(){
+
+    //TODO Throw exception
+    constructor(json: Any) : this("",""){
         if(json is JSONObject) {
-            this.href = if(json.has("href")) json.getString("href") else throw ParsingError.malformedJSON
-            this.type = if(json.has("type")) json.getString("type") else throw ParsingError.malformedJSON
+            this.href = if(json.has("href")) json.getString("href") else throw org.readium.r2.shared.Publication.Error.malformedJSON
+            this.type = if(json.has("type")) json.getString("type") else throw org.readium.r2.shared.Publication.Error.malformedJSON
             this.title = json.getString("title")
-            this.locations = if(json.has("locations")) Locator(json.get("locations")) else null
+            this.locations = if(json.has("locations")) Locations(json.get("locations")) else null
             this.text = if(json.has("text")) LocatorText(json.get("locations")) else null
         }
     }
 
-    constructor(link: Link) : this() {
+    //TODO : complete
+    constructor(link: Link) : this("","") {
 
-    }*/
+    }
 }
 
 
@@ -82,11 +77,21 @@ data class LocatorText(var _after: String? = null, var _before: String? = null, 
             this.highlight = json.getString("highlight")
         } else throw JSONError.parsing(this)
     }
-    /** TODO : JSON STRING **/
+
+    fun toJSON() : JSONObject {
+        val json = JSONObject()
+        if(encodeIfNotNull(after) != null)
+            json.putOpt("after", after)
+        if(encodeIfNotNull(before) != null)
+            json.putOpt("before", before)
+        if(encodeIfNotNull(highlight) != null)
+            json.putOpt("highlight", highlight)
+        return json
+    }
 }
 
 
-data class Locations(var _fragment: String?, var _progression: Double?, var _position: Int?) {
+data class Locations(var _fragment: String? = null, var _progression: Double? = null, var _position: Int? = null) {
     /// Contains one or more fragment in the resource referenced by the Locator Object.
     var fragment: String? = null // 1 = fragment identifier (toc, page lists, landmarks)
     /// Progression in the resource expressed as a percentage.
@@ -100,7 +105,7 @@ data class Locations(var _fragment: String?, var _progression: Double?, var _pos
         this.position = _position
     }
 
-    /*
+
     constructor(json: Any) : this() {
         if(json is JSONObject) {
             this.fragment = json.getString("fragment")
@@ -108,14 +113,8 @@ data class Locations(var _fragment: String?, var _progression: Double?, var _pos
             this.position = json.getInt("position")
         } else throw JSONError.parsing(this)
     }
-    */
+
 }
-
-
-
-
-
-
 
 
 /*

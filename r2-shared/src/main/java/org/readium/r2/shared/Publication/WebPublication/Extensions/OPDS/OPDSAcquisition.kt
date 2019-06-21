@@ -1,10 +1,9 @@
 package org.readium.r2.shared.Publication.WebPublication.Extensions.OPDS
 
 import org.json.JSONObject
-import org.readium.r2.shared.Publication.ParsingError
+import org.readium.r2.shared.Publication.Error
 import org.readium.r2.shared.Publication.getStringArray
 import org.readium.r2.shared.Publication.parseArray
-import org.readium.r2.shared.Publication.parsePositiveDouble
 
 
 /// OPDS Acquisition Object
@@ -25,7 +24,7 @@ data class OPDSAcquisition (var _type: String, var _children: List<OPDSAcquisiti
     constructor(_json: Any?) : this("", listOf()) {
         if(_json != null) {
             var json = JSONObject(_json as String)
-            this.type = if(json.has("type")) json.getString("type") else throw ParsingError.malformedJSON
+            this.type = if(json.has("type")) json.getString("type") else throw Error.malformedJSON
             this.children = if(json.has("child")) parseArray(json.getJSONArray("child")) else listOf()
         }
     }

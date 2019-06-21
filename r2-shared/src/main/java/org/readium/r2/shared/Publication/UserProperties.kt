@@ -13,8 +13,30 @@ import java.io.Serializable
 
 sealed class UserProperty(var reference: String, var name: String) {
     fun toSring() = ""
-
 }
+
+class UserProperties : Serializable {
+
+    val properties: MutableList<UserProperty> = mutableListOf()
+
+    fun addIncremental(nValue: Float, min: Float, max: Float, step: Float, suffix: String, ref: String, name: String) {
+        properties.add(Incremental(nValue, min, max, step, suffix, ref, name))
+    }
+
+    fun addSwitchable(onValue: String, offValue: String, on: Boolean, ref: String, name: String) {
+        properties.add(Switchable(onValue, offValue, on, ref, name))
+    }
+
+    fun addEnumerable(index: Int, values: List<String>, ref: String, name: String) {
+        properties.add(Enumerable(index, values, ref, name))
+    }
+
+    fun <T : UserProperty> getByRef(ref: String) = properties.firstOrNull {
+        it.reference == ref
+    }!! as T
+}
+
+
 
 
 // TODO add here your new Subclasses of UserPreference. It has to be an abstract class inheriting from UserSetting.
@@ -45,27 +67,5 @@ class Switchable(onValue: String, offValue: String, var on: Boolean, ref: String
     }
 
     override fun toString() = values[on]!!
-}
-
-
-class UserProperties : Serializable {
-
-    val properties: MutableList<UserProperty> = mutableListOf()
-
-    fun addIncremental(nValue: Float, min: Float, max: Float, step: Float, suffix: String, ref: String, name: String) {
-        properties.add(Incremental(nValue, min, max, step, suffix, ref, name))
-    }
-
-    fun addSwitchable(onValue: String, offValue: String, on: Boolean, ref: String, name: String) {
-        properties.add(Switchable(onValue, offValue, on, ref, name))
-    }
-
-    fun addEnumerable(index: Int, values: List<String>, ref: String, name: String) {
-        properties.add(Enumerable(index, values, ref, name))
-    }
-
-    fun <T : UserProperty> getByRef(ref: String) = properties.firstOrNull {
-        it.reference == ref
-    }!! as T
 }
 

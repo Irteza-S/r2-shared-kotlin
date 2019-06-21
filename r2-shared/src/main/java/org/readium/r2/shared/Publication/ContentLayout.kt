@@ -7,29 +7,23 @@ enum class ReadingProgression (val rawValue: String) {
     }
 }
 
-enum class ContentLayoutStyle (val rawValue: String) {
-    rtl("rtl"), ltr("ltr"), cjkVertical("cjk-vertical"), cjkHorizontal("cjk-horizontal");
+sealed class ContentLayoutStyle (_language: String, _readingProgression: ReadingProgression? = null) {
 
-    companion object {
-        operator fun invoke(rawValue: String) = ContentLayoutStyle.values().firstOrNull { it.rawValue == rawValue }
-    }
+    object rtl : ContentLayoutStyle("rtl")
+    object ltr : ContentLayoutStyle("ltr")
+    object cjkVertical : ContentLayoutStyle("cjk-vertical")
+    object cjkHorizontal : ContentLayoutStyle("cjk-horizontal");
 
-
-    constructor(language: String, readingProgression: ReadingProgression? = null) {
-        val language: String = {
-            val code = language.split('-').firstOrNull()
-            if (code != null) {
-                code
-            }
-            language
-        }()
-        when (language.toLowerCase()) {
-            in "ar", "fa", "he" -> rtl
+    init {
+        when(_language.toLowerCase()) {
+            "ar", "fa", "he" -> rtl
             // Any Chinese: zh-*-*
-            in "zh", "ja", "ko" -> if ((readingProgression == rtl)) cjkVertical else cjkHorizontal
-            else -> if ((readingProgression == rtl)) rtl else ltr
+            "zh", "ja", "ko" -> if ((_readingProgression == ReadingProgression.rtl)) cjkVertical else cjkHorizontal
+            else -> if ((readingProgression == ReadingProgression.rtl)) rtl else ltr
         }
     }
+
+
 
     val readingProgression: ReadingProgression
         get() {

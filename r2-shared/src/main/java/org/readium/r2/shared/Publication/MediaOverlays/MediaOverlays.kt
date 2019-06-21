@@ -11,7 +11,7 @@ package org.readium.r2.shared.Publication.MediaOverlays
 
 
 /**
- * TODO : Throwable class
+ * TODO : Throwable class ?
  */
 /// Errors related to MediaOverlays.
 ///

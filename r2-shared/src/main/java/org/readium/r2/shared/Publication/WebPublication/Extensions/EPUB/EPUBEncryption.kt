@@ -1,9 +1,8 @@
 package org.readium.r2.shared.Publication.WebPublication.Extensions.EPUB
 
 import org.json.JSONObject
-import org.readium.r2.shared.Publication.ParsingError
+import org.readium.r2.shared.Publication.Error
 import org.readium.r2.shared.Publication.encodeIfNotNull
-import org.readium.r2.shared.Publication.getStringArray
 
 
 /// Indicates that a resource is encrypted/obfuscated and provides relevant information for decryption.
@@ -31,7 +30,7 @@ data class EPUBEncryption(val _algorithm: String, val _compression: String? = nu
     constructor(_json: Any?) : this("") {
         if(_json != null) {
             var json = JSONObject(_json as String)
-            this.algorithm = if(json.has("algorithm")) json.getString("algorithm") else throw ParsingError.malformedJSON
+            this.algorithm = if(json.has("algorithm")) json.getString("algorithm") else throw Error.malformedJSON
             this.compression = if(json.has("compression")) json.getString("compression") else null
             this.originalLength = if(json.has("original-length")) json.getInt("original-length") else null
             this.profile = if(json.has("profile")) json.getString("profile") else null

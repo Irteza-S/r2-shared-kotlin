@@ -14,10 +14,7 @@ import org.readium.r2.shared.Encryption
 import org.readium.r2.shared.JSONable
 import org.readium.r2.shared.OPDS.IndirectAcquisition
 import org.readium.r2.shared.OPDS.Price
-import org.readium.r2.shared.Publication.JSONDictionary
-import org.readium.r2.shared.Publication.JSONError
-import org.readium.r2.shared.Publication.getStringArray
-import org.readium.r2.shared.Publication.parseRaw
+import org.readium.r2.shared.Publication.*
 import java.io.Serializable
 
 
@@ -40,45 +37,6 @@ class Properties : JSONable, Serializable {
 
     // Trick to keep the struct equatable despite [String: Any]
     private var otherPropertiesJSON: JSONDictionary = JSONDictionary()
-
-
-    //Not in iOS anymore
-    /*
-    /// Suggested orientation for the device when displaying the linked resource.
-    var orientation: String? = null
-    /// Indicates how the linked resource should be displayed in a reading
-    /// environment that displays synthetic spreads.
-    var page: String? = null
-    /// Identifies content contained in the linked resource, that cannot be
-    /// strictly identified using a media type.
-    var contains: MutableList<String> = mutableListOf()
-    /// Location of a media-overlay for the resource referenced in the Link Object.
-    private var mediaOverlay: String? = null
-    /// Indicates that a resource is encrypted/obfuscated and provides relevant
-    /// information for decryption.
-    var encryption: Encryption? = null
-    /// Hint about the nature of the layout for the linked resources.
-    var layout: String? = null
-    /// Suggested method for handling overflow while displaying the linked resource.
-    var overflow: String? = null
-    /// Indicates the condition to be met for the linked resource to be rendered
-    /// within a synthetic spread.
-    var spread: String? = null
-    ///
-    var numberOfItems: Int? = null
-    ///
-    var price: Price? = null
-    ///
-    var indirectAcquisition: MutableList<IndirectAcquisition> = mutableListOf()
-    */
-
-    /**
-    * TODO:
-    */
-    val json: JSONObject
-        get() {
-            return toJSON()
-        }
 
     /**
      * TODO: Subscript + Mutating functions
@@ -119,21 +77,46 @@ class Properties : JSONable, Serializable {
         }
     }
 
-
-    /**
-     * TODO: make JSON
-     */
+    //TODO : make JSON
     override fun toJSON(): JSONObject {
         val json = JSONObject()
-        /*
-        if (contains.isNotEmpty()) json.put("contains", getStringArray(contains))
-        json.putOpt("mediaOverlay", mediaOverlay)
-        json.putOpt("encryption", encryption)
-        json.putOpt("layout", layout)
-        json.putOpt("orientation", orientation)
-        json.putOpt("overflow", overflow)
-        json.putOpt("page", page)
-        json.putOpt("spread", spread)*/
+        if(encodeIfNotNull(orientation) != null)
+            json.putOpt("orientation", orientation)
+        if(encodeIfNotNull(page) != null)
+            json.putOpt("page", page)
         return json
     }
+
+
+
+
+    //Not in iOS anymore
+    /*
+    /// Suggested orientation for the device when displaying the linked resource.
+    var orientation: String? = null
+    /// Indicates how the linked resource should be displayed in a reading
+    /// environment that displays synthetic spreads.
+    var page: String? = null
+    /// Identifies content contained in the linked resource, that cannot be
+    /// strictly identified using a media type.
+    var contains: MutableList<String> = mutableListOf()
+    /// Location of a media-overlay for the resource referenced in the Link Object.
+    private var mediaOverlay: String? = null
+    /// Indicates that a resource is encrypted/obfuscated and provides relevant
+    /// information for decryption.
+    var encryption: Encryption? = null
+    /// Hint about the nature of the layout for the linked resources.
+    var layout: String? = null
+    /// Suggested method for handling overflow while displaying the linked resource.
+    var overflow: String? = null
+    /// Indicates the condition to be met for the linked resource to be rendered
+    /// within a synthetic spread.
+    var spread: String? = null
+    ///
+    var numberOfItems: Int? = null
+    ///
+    var price: Price? = null
+    ///
+    var indirectAcquisition: MutableList<IndirectAcquisition> = mutableListOf()
+    */
 }

@@ -3,14 +3,14 @@ package org.readium.r2.shared.Publication
 /**
  * TODO : Fix
  */
-sealed class ParsingError : Exception() {
-    object malformedJSON : ParsingError()
-    object licenseDocument : ParsingError()
-    object statusDocument : ParsingError()
-    object link : ParsingError()
-    object encryption : ParsingError()
-    object signature : ParsingError()
-    data class url(val rel: String) : ParsingError()
+sealed class Error : Exception() {
+    object malformedJSON : Error()
+    object licenseDocument : Error()
+    object statusDocument : Error()
+    object link : Error()
+    object encryption : Error()
+    object signature : Error()
+    data class url(val rel: String) : Error()
 
     val errorDescription: String?
         get() {
