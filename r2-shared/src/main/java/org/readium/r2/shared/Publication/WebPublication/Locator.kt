@@ -7,9 +7,10 @@
  * LICENSE file present in the project repository where this source code is maintained.
  */
 
-package org.readium.r2.shared
+package org.readium.r2.shared.Publication.WebPublication
 
 import org.json.JSONObject
+import org.readium.r2.shared.JSONable
 import java.io.Serializable
 
 /**

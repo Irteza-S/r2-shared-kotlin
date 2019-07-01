@@ -7,17 +7,20 @@
  * LICENSE file present in the project repository where this source code is maintained.
  */
 
-package org.readium.r2.shared.opds
+package org.readium.r2.shared.OPDS
 
+import org.readium.r2.shared.Publication.WebPublication.Link.Link
 import java.io.Serializable
-import java.util.*
 
 
-data class OpdsMetadata(var title: String) : Serializable {
-    var numberOfItems: Int? = null
-    var itemsPerPage: Int? = null
-    var currentPage: Int? = null
-    var modified: Date? = null
-    var position: Int? = null
-    var rdfType: String? = null
+data class Facet(val title: String) : Serializable {
+
+    var metadata: OpdsMetadata
+    var links: MutableList<Link>
+
+    init {
+        this.metadata = OpdsMetadata(title)
+        this.links = mutableListOf()
+    }
+
 }

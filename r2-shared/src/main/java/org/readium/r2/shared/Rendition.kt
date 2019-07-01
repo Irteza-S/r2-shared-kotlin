@@ -10,6 +10,7 @@
 package org.readium.r2.shared
 
 import org.json.JSONObject
+import org.readium.r2.shared.Publication.Publication
 import java.io.Serializable
 
 enum class RenditionLayout(val value: String) : Serializable {
